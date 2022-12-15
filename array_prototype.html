@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			Array.prototype._map = function(cb) {
+				console.log(this)
+			};
+			Array.prototype._reduce = function(cb, initState = 0) {
+				let cur =  initState || this[0];
+				const index = initState ? 0 : 1;
+				for(let i = index;i < this.length; i++) {
+					cur = cb(cur, this[i], i, this)
+				}
+				return cur
+			}
+			// [1,2,3]._reduce((cur, pre) => cur + pre)
+			Function.prototype._bind = function(_t, ...ctx) {
+				const fn = this;
+				return function _fn(...arg) {
+					if (this instanceof _fn) {
+						return new fn(...ctx, ...arg)
+					} else return fn.call(_t, ...ctx, ...arg)
+				}
+			}
+			const fn = function() {
+				console.log(this)
+			}
+			function _new() {
+				const obj = new Object();
+				const Constructor = [].shift.call(arguments);
+				obj.__proto__ = Constructor.prototype;
+				Constructor.call(obj)
+				return obj
+			}
+			const o = _new(fn);
+			console.log(o.__proto__ === fn.prototype);
+			const _permute = string => {
+				// 补全代码
+				const resourceList = string.split('');
+				const list = [];
+				for(let i = 0; i < string.length; i++) {
+					// resourceList[i]
+					const tempList = string.split('');
+					tempList.splice(i, 1);
+					
+					for(let j = 0; j <= tempList.length; j++) {
+						if (i > 1) debugger
+						// debugger
+						const temp = tempList.toString().split(',');
+						temp.splice(j, 0, resourceList[i]);
+						if (!list.includes(temp.join(''))) list.push(temp.join(''))
+						// debugger
+					}
+				}
+				return list
+			}
+			// const data = _permute('abc')
+			const obj = {
+				name: 'xyc',
+				fn: function() {}
+			};
+			function _fz(obj) {
+				const freeze = new Proxy(obj, {
+					get: (_t, k) => {
+						return _t[k]
+					},
+					set: (t, k, v) => {
+						debugger
+						return false
+					}
+				});
+			}
+			
+		</script>
+	</body>
+</html>

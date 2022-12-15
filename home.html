@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>home</title>
+	</head>
+	<body>
+		<div class="banner"></div>
+		<div class="content"></div>
+		<div class="img">
+			<span>loading</span>
+		</div>
+		<input type="text">
+		<div id="div"></div>
+		<style>
+			div, body, html {
+				padding: 0;
+				margin: 0;
+			}
+			.banner {
+				width: 100%;
+				height: 100vh;
+				background-color: aqua;
+			}
+			.content {
+				height: 200px;
+				background-color: aquamarine;
+			}
+			.img {
+				min-height: 300px;
+				background-color: aliceblue;
+				text-align: center;
+			}
+			.img>span {
+				line-height: 300px;
+				font-size: 50px;
+			}
+			img {
+				transition: all .5s ease-out;
+			}
+		</style>
+		<script>
+			const img = document.querySelector('.img');
+			const observer = new IntersectionObserver((e, self) => {
+				console.log(e)
+				const status = e.some(item => item.intersectionRatio > 0);
+				if (status) {
+					createImgEle();
+					if (e.some(el => el.target === img)) self.unobserve(img)
+				}
+			}, {
+				threshold: 0.5
+			})
+			
+			observer.observe(img);
+			function createImgEle() {
+				const imgctx = document.createElement('img');
+				const loading = document.querySelector('.img>span');
+				imgctx.src = 'https://img2.baidu.com/it/u=4084621093,2971972319&fm=253&fmt=auto&app=120&f=JPEG?w=889&h=500';
+				img.append(imgctx);
+				img.removeChild(loading)
+			}
+			const div = document.getElementById('div');
+			document.querySelector('input').onchange = e => {
+				console.log(e)
+			}
+		</script>
+	</body>
+</html>

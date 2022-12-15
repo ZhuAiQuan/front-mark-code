@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="js/EventBus.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			const bus = new EventBus();
+			bus.once('test', data => {
+				console.log(data)
+			});
+			// bus.on('test', data => {
+			// 	console.log(data)
+			// })
+			bus.emit('test', 'dingzong yyds');
+			bus.emit('test', 'dingzong yyds');
+			// bus.off('test');
+			// bus.emit('test', 'dingzong yyds');
+			
+		</script>
+	</body>
+</html>

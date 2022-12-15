@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="js/observer.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			// const s = new Observerd('小明');
+			// const s1 = new Observer(s);
+			// s.setState('走路')
+			const obd = new Observerd('g');
+			const ob = new Observer();
+			obd.setObserver(ob);
+			obd.setState('跑步');
+		</script>
+	</body>
+</html>

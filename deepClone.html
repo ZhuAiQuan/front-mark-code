@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			const o1 = {name: 'g', age: 18, o: {name: 'o'}, a: [1,2], r: new RegExp(), d: new Date()};
+			o1.self = o1;
+			function cloneDeep(target, map = new WeakMap()) {
+				if (typeof target === 'object') {
+					
+					if (!Object.keys(target).length) {
+						const Type = target.constructor
+						return new Type(target)
+					}
+					const cloneTarget = Array.isArray(target) ? [] : {};
+					if (map.get(target)) {
+						return map.get(target)
+					}
+					map.set(target, cloneTarget);
+					for(const key in target) {
+						cloneTarget[key] = cloneDeep(target[key], map)
+					}
+					return cloneTarget
+				} else {
+					return target
+				}
+			}
+			var o2 = cloneDeep(o1)
+			o1.name = 'z';o1.age = 1;const judge = o1.name !== o2.name && o1.age !== o2.age && o1.o !== o2.o && o1.a !== o2.a && o1.r !== o2.r && o1.d !== o2.d && o1.self.self.self.self.self.self.self.self.self === o1.self && o1.self !== o2.self;
+			
+			
+		</script>
+	</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			const p = new Proxy({}, {
+				get(target, key) {
+					// debugger
+					return target[key]++
+				}
+			})
+			p.a = 0;
+			const n = 0
+			const foo = {
+				a: 0
+			};
+			const obj = Object.defineProperty(foo, 'a', {
+				get() {
+					return n++
+				}
+			});
+			const a = obj.a;
+			console.log(a)
+		</script>
+	</body>
+</html>

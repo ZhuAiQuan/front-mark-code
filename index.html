@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css" />
+		<link rel="stylesheet" type="text/css" href="./css/index.css" />
+	</head>
+	<body>
+		<!-- <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script> -->
+		<script src="js/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="./js/rainyday.js" type="text/javascript" charset="utf-8"></script>
+		<div style="width: 200px;margin-right: 10px;margin-bottom: 20px;">
+			<input type="text" class="layui-input" id="test1" placeholder="选择时间">
+		</div>
+		<div class="background"></div>
+		<canvas id="rain" width="1000" height="1000" style="position: absolute;"></canvas>
+		<script type="text/javascript">
+			$(function () {
+				console.log(23456)
+			})
+			$(function() {
+				console.log(123)
+			})
+			$(function() {
+				console.log(999)
+			})
+			// function run() {
+			// 	var image = document.getElementById('background');
+			// 	image.onload = function() {
+			// 		var engine = new RainyDay({
+			// 			image: this,
+			// 			gravityAngle: Math.PI / 9
+			// 		});
+			// 		engine.trail = engine.TRAIL_SMUDGE;
+			// 		engine.rain([ [1, 0, 1000], [3, 3, 1] ], 100);
+			// 	};
+			// 	image.crossOrigin = 'anonymous';
+			// 	image.src = 'css/4.jpg';
+			
+			// 	// hide info container
+			// 	document.getElementById('infobox').children[0].style.visibility = 'visible';
+			// 	setTimeout(function(){
+			// 		// remove inline style -otherwise the hover effect would not be effective
+			// 		document.getElementById('infobox').children[0].style.visibility = '';
+			// 	}, 5000);
+			// }
+			// window.onload = run()
+		</script>
+		<ul class="layui-timeline"></ul>
+		<script type="text/javascript">
+			const obj = {
+				name: 'dingzong'
+			};
+			const _obj = new Proxy(obj, {
+				get: function(target, key) {
+					console.log(`当前对象的key是 ${key},输出${target[key]}`);
+					return target[key]
+				},
+				set: function(target, key, val) {
+					console.log(`当前对象的key是 ${key}, 新值是${val}`);
+					target[key] = val
+				}
+			})
+			_obj.name = 'dz';
+			function newFn(fn) {
+				const obj = {};
+				obj.__proto__ = fn.prototype;
+				const arg = Array.prototype.slice.call(arguments, 1);
+				const result = fn.call(obj, ...arg);
+				return result
+			}
+			function foo() {
+				this.name = 'dz';
+				this.arg = arguments[0];
+				console.log(arguments)
+			}
+			const test = newFn(foo, 'dingzong', '666');
+			Function.prototype.newCall = function(_t, ...arg) {
+				_t.fn = this;
+				const result = _t.fn(...arg);
+				return result
+			}
+			foo.newCall(obj, 'z');
+			Function.prototype.newApply = function(_t, arg) {
+				_t.fn = this;
+				const result = _t.fn(arg);
+				return result
+			}
+			// 防抖
+			/**
+			 *  在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时
+			 */
+			function debounce(fn) {
+				let time = null;
+				return function(num) {
+					if (time) clearTimeout(time)
+					time = setTimeout(fn, num)
+				}
+			}
+			/**
+			 * 节流
+			 * 规定在一个单位时间内，只能触发一次函数。如果这个单位时间内触发多次函数，只有一次生效
+			 * */
+			 function throttle(fn) {
+				 let state = false;
+				 return function(time) {
+					 if (state) return
+					 state = true
+					 setTimeout(() => {
+						 fn();
+						 state = false;
+					 }, time)
+				 }
+			 }
+			// Function.prototype.newBind = function(_t) {
+			// 	const that = this;
+			// 	const params = arguments.slice(1);
+			// 	return function() {
+					
+			// 	}
+			// }
+			// 循环的数组
+			// const list = [
+			// 	{
+			// 		date: '2020-10-23',
+			// 		data: [
+			// 			{
+			// 				time: '08-18 09:15:22',
+			// 				avatar: '',
+			// 				concat: '赵小刚  跟进(电话)',
+			// 				content: '电话联系了客户，客户对产品意向很高，但是希望价格能有优惠。',
+			// 				link: 'https://www.baidu.com',
+			// 				link_text: '深圳市腾讯科技有限公司'
+			// 			},
+			// 			{
+			// 				time: '08-18 12:15:21',
+			// 				avatar: '',
+			// 				concat: '赵刚1  跟进(电话)',
+			// 				content: '电话联系了客户，客户对产品意向很高，但是希望价格能有优惠。',
+			// 				link: 'https://www.baidu.com',
+			// 				link_text: '深圳市腾讯科技有限公司1'
+			// 			}
+			// 		]
+			// 	},
+			// 	{
+			// 		date: '2020-10-24',
+			// 		data: [
+			// 			{
+			// 				time: '08-18 09:15:22',
+			// 				avatar: '',
+			// 				concat: '赵小刚  跟进(电话)',
+			// 				content: '电话联系了客户，客户对产品意向很高，但是希望价格能有优惠。',
+			// 				link: 'https://www.baidu.com',
+			// 				link_text: '深圳市腾讯科技有限公司'
+			// 			},
+			// 			{
+			// 				time: '08-18 12:15:21',
+			// 				avatar: '',
+			// 				concat: '赵刚1  跟进(电话)',
+			// 				content: '电话联系了客户，客户对产品意向很高，但是希望价格能有优惠。',
+			// 				link: 'https://www.baidu.com',
+			// 				link_text: '深圳市腾讯科技有限公司1'
+			// 			}
+			// 		]
+			// 	},
+			// 	{
+			// 		date: '2020-10-25',
+			// 		data: [
+			// 			{
+			// 				time: '08-18 09:15:22',
+			// 				avatar: '',
+			// 				concat: '赵小刚  跟进(电话)',
+			// 				content: '电话联系了客户，客户对产品意向很高，但是希望价格能有优惠。',
+			// 				link: 'https://www.baidu.com',
+			// 				link_text: '深圳市腾讯科技有限公司'
+			// 			},
+			// 			{
+			// 				time: '08-18 12:15:21',
+			// 				avatar: '',
+			// 				concat: '赵刚1  跟进(电话)',
+			// 				content: '电话联系了客户，客户对产品意向很高，但是希望价格能有优惠。',
+			// 				link: 'https://www.baidu.com',
+			// 				link_text: '深圳市腾讯科技有限公司1'
+			// 			}
+			// 		]
+			// 	}
+			// ]
+			// // 闭合的节点
+			// const end = `
+			// 		</div>
+			// 	</li>
+			// `
+			// const dom = $('.layui-timeline');
+			// // 封装循环插入事件
+			// function appendChild(list = []) {
+			// 	if (!Array.isArray(list)) {
+			// 		return
+			// 	};
+			// 	list.forEach(item => {
+			// 		let str = `
+			// 			<li class="layui-timeline-item">
+			// 				<i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+			// 				<div class="layui-timeline-content layui-text">
+			// 					<div class="layui-timeline-title">
+			// 						<span class="top-sj"></span>
+			// 						<span class="custom-bg">${item.date}</span>
+			// 					</div>
+			// 		`;
+			// 		let content = '';
+			// 		if(Array.isArray(item.data) && item.data.length) {
+			// 			item.data.forEach(row => {
+			// 				content += `
+			// 					<div class="custom-content">
+			// 						<div class="content-top">
+			// 							<img src="${row.avatar}" />
+			// 							<span class="concat">${row.concat}</span>
+			// 							<div class="close">
+			// 								<i class="layui-icon" style="line-height: 30px;">&#x1006;</i>
+			// 							</div>
+			// 							<span>${row.time}</span>
+			// 						</div>
+			// 						<div class="content-center">${row.content}</div>
+			// 						<div class="content-btm">
+			// 							<span class="title">来自客户：</span>
+			// 							<span class="a-link">
+			// 								<a href="${row.link}">${row.link_text}</a>
+			// 							</span>
+			// 							<button type="button" class="layui-btn layui-btn-primary custom-btn">> 详情</button>
+			// 						</div>
+			// 					</div>
+			// 					<div class="custom-badge">
+			// 						<i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+			// 					</div>
+			// 					<div class="custom_div"></div>
+			// 				`
+			// 			})
+			// 		}
+					
+			// 		dom.append(str + content + end);
+			// 	})
+			// }
+			// appendChild(list);
+			// // 日期筛选
+			// layui.use('laydate', function(){
+			//   var laydate = layui.laydate;
+			  
+			//   //执行一个laydate实例
+			//   laydate.render({
+			//     elem: '#test1', //指定元素
+			// 	format: 'yyyy-MM-dd',
+			// 	value: '',
+			// 	done: function(value) {
+			// 		if (value) { // 选择日期后触发
+			// 			dom.empty(); // 清空子节点
+			// 			const arr = list.filter(item => item.date === value);
+			// 			if (arr.length) appendChild(arr)
+			// 			else {
+			// 				// 没有找到筛选的数据
+			// 			}
+			// 		} else { // 清空日期选择后恢复
+			// 			dom.empty();
+			// 			appendChild(list)
+			// 		}
+			// 	}
+			//   });
+			// });
+		</script>
+		
+		<!-- <table class="layui-table">
+		  <colgroup>
+		    <col width="150">
+		    <col width="200">
+		    <col>
+		  </colgroup>
+		  <thead>
+		    <tr>
+		      <th>昵称</th>
+		      <th>加入时间</th>
+		      <th>签名</th>
+			  <th>操作</th>
+		    </tr> 
+		  </thead>
+		  <tbody>
+		    <tr>
+		      <td>贤心</td>
+		      <td>2016-11-29</td>
+		      <td>人生就像是一场修行</td>
+			  <td>
+				  <input type="file" name="" id="" value="" />
+			  </td>
+		    </tr>
+		    <tr>
+		      <td>许闲心</td>
+		      <td>2016-11-28</td>
+		      <td>于千万人之中遇见你所遇见的人，于千万年之中，时间的无涯的荒野里…</td>
+			  <td>
+				  <input type="file" name="" id="" value="" />
+			  </td>
+		    </tr>
+		  </tbody>
+		</table> -->
+		<div class='wrap'>
+			<div class='left'></div>
+			<div class='right'></div>
+		</div>
+		<table id="jsTrolley">
+		    <thead><tr><th>名称</th><th>价格</th><th>操作</th></tr></thead>
+		    <tbody>
+		        <tr><td>产品1</td><td>10.00</td><td><a href="javascript:void(0);">删除</a></td></tr>
+		        <tr><td>产品2</td><td>30.20</td><td><a href="javascript:void(0);">删除</a></td></tr>
+		        <tr><td>产品3</td><td>20.50</td><td><a href="javascript:void(0);">删除</a></td></tr>
+		    </tbody>
+		    <tfoot><tr><th>总计</th><td colspan="2">60.70(3件商品)</td></tr></tfoot>
+		</table>
+		<style type="text/css">
+			.wrap {
+			                /*补全代码*/
+			                clear: both;
+							background-color: firebrick;
+			            }
+			             .left {
+			                width: 100px;
+			                height: 100px;
+			                /*补全代码*/
+			                float: left;
+							background-color: #00FF00;
+			            }
+			             .right {
+			                width: 100px;
+			                height: 100px;
+			                /*补全代码*/
+			                float: left;
+							background-color: #0000FF;
+			            }
+						body,html{
+						    padding: 0;
+						    margin: 0;
+						    font-size: 14px;
+						    color: #000000;
+						}
+						table{
+						    border-collapse: collapse;
+						    width: 100%;
+						    table-layout: fixed;
+						}
+						thead{
+						    background: #3d444c;
+						    color: #ffffff;
+						}
+						td,th{
+						    border: 1px solid #e1e1e1;
+						    padding: 0;
+						    height: 30px;
+						    line-height: 30px;
+						    text-align: center;
+						}
+		</style>
+		<script type="text/javascript">
+			$('input[type=file]').bind('change', (e) => {
+				debugger
+			});
+			function add(items) {
+			    const tbody = document.getElementsByTagName('tbody')[0];
+			    const count = document.querySelector('#jsTrolley>tfoot>tr>td');
+			    let price = 0;
+			    items.forEach(item => {
+			        price += item.price;
+			        const tr = document.createElement('tr');
+			        const td1 = document.createElement('td');
+			        td1.innerText = item.name;
+			        tr.appendChild(td1);
+					const td2 = document.createElement('td');
+			        td2.innerText = item.price.toFixed(2);
+			        tr.appendChild(td2);
+					const td3 = document.createElement('td');
+			        const a = document.createElement('a');
+			        a.innerText = '删除';
+			        a.href = 'javascript:void(0)';
+					td3.appendChild(a);
+			        tr.appendChild(td3);
+					tbody.appendChild(tr)
+			    })
+			    const beforeCount = parseFloat(count.innerText);
+			    const afterCount = (beforeCount + price).toFixed(2);
+				
+			    const num = document.querySelectorAll('#jsTrolley>tbody>tr')
+			    count.innerText = `${afterCount}(${num.length}件商品)`
+			}
+			const info = [
+				{
+					name: '4',
+					price: 43
+				},
+				{
+					name: '5',
+					price: 7.9
+				},
+				{
+					name: '6',
+					price: 13.5
+				}
+			]
+			add(info);
+			const li = document.querySelectorAll('#jsTrolley>tbody>tr');
+			for(let i = 0;i<li.length;i++) {
+				li[i].addEventListener('click', function(e) {
+					const tr = e.target.parentNode.parentNode;
+					// 获取删除这一行的价格
+					const price = +(tr.childNodes[1].innerText);
+					const tbody = document.getElementsByTagName('tbody')[0];
+					tbody.removeChild(tr);
+					const count = document.querySelector('#jsTrolley>tfoot>tr>td');
+					const beforeCount = parseFloat(count.innerText);
+					const afterCount = (beforeCount - price).toFixed(2);
+					const num = document.querySelectorAll('#jsTrolley>tbody>tr')
+					count.innerText = `${afterCount}(${num.length}件商品)`
+				})
+			}
+		</script>
+	</body>
+</html>

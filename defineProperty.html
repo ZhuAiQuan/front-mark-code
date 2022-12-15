@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			let value = 1;
+			Object.defineProperty(window, 'foo', {
+				get: () => {
+					return value++
+				}
+			})
+			console.log(foo === 1 && foo === 2)
+		</script>
+	</body>
+</html>

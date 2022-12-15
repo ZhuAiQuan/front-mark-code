@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			const PENDING = 'pendding';
+			const FULFILLED = 'fulfilled';
+			const REJECTED = 'rejected';
+			
+			class Promise_ {
+				resolveCallback = [];
+				rejectCalback = [];
+				value = null;
+				reason = null;
+				constructor(executor) {
+				    this.state = PENDING;
+					executor(this.resolve, this.reject)
+				}
+				resolve = (value) => {
+					if (this.state === PENDING) {
+						this.state = FULFILLED;
+						this.value = value;
+						this.resolveCallback.length && this.resolveCallback.shift()(value)
+					}
+				}
+				reject = (reason) => {
+					if (this.state === PENDING) {
+						this.state = REJECTED;
+						this.reason = reason;
+						this.rejectCalback.length && this.rejectCalback.shift()(reason)
+					}
+					
+				}
+				then(onResolve) {
+					switch(this.state) {
+						case FULFILLED:
+							onResolve(this.value);
+							this.resolveCallback.length && this.resolveCallback.shift()
+							break;
+						default:
+							this.resolveCallback.push(onResolve);
+					}
+					return this
+					
+				}
+				catch(onReject) {
+					switch(this.state) {
+						case REJECTED:
+							onReject(this.reason);
+							this.rejectCalback.length && this.rejectCalback.shift()
+							break;
+						default:
+							this.rejectCalback = onReject
+					}
+					return this
+				}
+				finally(onFinally) {
+					
+				}
+			}
+			const data = new Promise_((resolve, reject) => {
+				setTimeout(() => {
+					// resolve(123)
+					reject(new Error('oops~'))
+				}, 3000)
+			})
+			data.then(res => {
+				console.log(res)
+			}).catch(err => {
+				console.log(err)
+			})
+		</script>
+	</body>
+</html>
