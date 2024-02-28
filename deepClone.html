@@ -9,24 +9,25 @@
 			const o1 = {name: 'g', age: 18, o: {name: 'o'}, a: [1,2], r: new RegExp(), d: new Date()};
 			o1.self = o1;
 			function cloneDeep(target, map = new WeakMap()) {
-				if (typeof target === 'object') {
-					
-					if (!Object.keys(target).length) {
-						const Type = target.constructor
-						return new Type(target)
+				// 基础类型以及function 
+				if (!target || typeof target !== 'object') return target
+				// 日期
+				if (target instanceof Date) return new Date(target)
+				// 正则
+				if (target instanceof RegExp) return new RegExp(target)
+				// map中存在
+				if (map.get(target)) return map.get(target)
+				// 其他引用类型可遍历 创建实例
+				let temp = new target.constructor;
+				// 存到map中
+				map.set(target, temp);
+				// 遍历这个引用类型
+				for(let key in target) {
+					if (target.hasOwnProperty(key)) {
+						temp[key] = cloneDeep(target[key], map)
 					}
-					const cloneTarget = Array.isArray(target) ? [] : {};
-					if (map.get(target)) {
-						return map.get(target)
-					}
-					map.set(target, cloneTarget);
-					for(const key in target) {
-						cloneTarget[key] = cloneDeep(target[key], map)
-					}
-					return cloneTarget
-				} else {
-					return target
 				}
+				return temp
 			}
 			var o2 = cloneDeep(o1)
 			o1.name = 'z';o1.age = 1;const judge = o1.name !== o2.name && o1.age !== o2.age && o1.o !== o2.o && o1.a !== o2.a && o1.r !== o2.r && o1.d !== o2.d && o1.self.self.self.self.self.self.self.self.self === o1.self && o1.self !== o2.self;
