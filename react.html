@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React</title>
+</head>
+<body>
+  <!-- 参考大佬代码手动实现react函数式组件基础框架功能，只包含useState实现 -->
+  <script>
+    let currentComponent = null;
+
+    function createComponents(renderFn) {
+      return function Component() {
+        currentComponent = {
+          state: [],
+          stateIndex: 0,
+          renderFn,
+          render: function() {
+            this.stateIndex = 0;
+            const newVnode = this.renderFn();
+            const rootElement = document.getElementById('root') || document.body;
+
+            if (!this.vNode) {
+              this.vNode = newVnode;
+              rootElement.appendChild(createElement(newVnode))
+            } else {
+              patch(rootElement, diff(this.vNode, newVnode));
+              this.vNode = newVnode;
+            }
+          }
+        }
+        currentComponent.render();
+        return currentComponent;
+      }
+    }
+    function createElement(vnode) {
+      if (typeof vnode === 'string') return document.createTextNode(vnode)
+
+      const { tag, props, children } = vnode;
+      const el = document.createElement(tag);
+      for(const key in props) {
+        el[key] = props[key];
+      }
+      if (Array.isArray(children)) children.forEach((child) => el.appendChild(createElement(child)))
+
+      return el;
+    }
+
+    /**
+     * diff 算法 
+     * 同层比较
+     */
+    function diff(oldN, node) {
+      if (!oldN) {
+        return {
+          type: 'CREATE', node
+        }
+      }
+      if (!node) {
+        return {
+          type: 'REMOVE'
+        }
+      }
+      if (typeof oldN !== typeof node || oldN.tag !== node.tag) {
+        return {
+          type: 'REPLACE', node
+        }
+      }
+      if (typeof node === 'string') {
+        if (oldN !== node) return {type: 'TEXT', node}
+        return null
+      }
+
+      return {
+        type: 'UPDATE',
+        props: diffProps(oldN.props, node.props),
+        children: diffChildren(oldN.children, node.children)
+      }
+    }
+    /**
+     * 比较参数props
+     */
+    function diffProps(oldP, props) {
+      const patchs = [];
+
+      for(const key in props) {
+        if (props[key] !== oldP[key]) {
+          patchs.push({
+            key,
+            value: props[key]
+          })
+        }
+      }
+      for(const key in oldP) {
+        if (!Reflect.has(props, key)) {
+          patchs.push({key, value: undefined})
+        }
+      }
+    }
+    function diffChildren(oldC, children) {
+      const patchs = [];
+      const len = Math.max(oldC.length, children.length);
+
+      for(let i = 0; i < len; i++) {
+        patchs.push(diff(oldC[i], children[i]))
+      }
+
+      return patchs
+    }
+    function patch(parent, patchObj, index = 0) {
+      if (!patchObj) return;
+      const { type } = patchObj;
+
+      const el = parent.childNodes[index];
+      let newEl;
+
+      switch(type) {
+        case 'CREATE':
+          newEl = createElement(patchObj.node);
+          parent.appendChild(newEl);
+          break;
+        case 'REMOVE':
+          if (el) parent.removeChild(el)
+          break;
+        case 'UPDATE':
+          if (el) {
+            const { props, children } = patchObj;
+
+            if (Array.isArray(props)) props.forEach(({key, value}) => {
+              if (value === undefined) {
+                el.removeAttribute(key);
+              } else {
+                el[key] = value;
+              }
+            });
+            Array.isArray(children) && children.forEach((child, i) => {
+              patch(el, child, i)
+            })
+          }
+          break;
+        case 'REPLACE':
+          newEl = createElement(patchObj.node);
+          if (el) parent.replaceChild(newEl, el)
+          else parent.appendChild(newEl)
+          break;
+        case 'TEXT':
+          el && (el.textContent = patchObj.node)
+          break;
+      }
+    }
+    /**
+     * useState 实现逻辑
+     */
+    function useState(initalValue) {
+      if (!currentComponent) throw new Error('useState must be called within a component')
+
+      const index = currentComponent.stateIndex;
+      if (!currentComponent.state[index]) {
+        currentComponent.state[index] = [
+          initalValue,
+          (value) => {
+            // 如果 updater 是函数，则用它来更新状态，否则直接用值更新
+            const newValue = typeof value === 'function' ? value(currentComponent.state[index][0]) : value;
+            if (newValue !== currentComponent.state[index][0]) {
+              currentComponent.state[index][0] = newValue;
+              currentComponent.render();
+            }
+          }
+        ]
+      }
+
+      const [state, setState] = currentComponent.state[index];
+      currentComponent.stateIndex++;
+
+      return [state, setState];
+    }
+    /**
+     * h 函数抽象树结构
+     */
+    function h(tag, props, ...children) {
+      return {tag, props, children}
+    }
+
+    const MyComponent = createComponents(function() {
+      const [count, setCount] = useState(0);
+
+      function increment() {
+        setCount(count => count + 1)
+      }
+      function decrement() {
+        setCount(count => count-1)
+      }
+
+      return h('div', { className: 'my-component' }, 
+        h('div', { className: 'container'}, 
+          h('p', { className: 'message' }, `Count: ${count}`),
+          h('div', { className: 'btn-group' },
+            h('button', { onclick: increment }, 'Increment'),
+            h('button', { onclick: decrement }, 'Decrement')
+          )
+        )
+      )
+    });
+
+    // 创建根节点
+    const root = document.createElement('div');
+    root.id = 'root';
+    document.body.appendChild(root);
+
+    const App = MyComponent();
+    App.render();
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .my-component {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
+        background: #f0f0f0;
+      }
+      .my-component .container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      .my-component .message {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .my-component .btn-group button {
+        font-size: 16px;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        transition: background 0.3s;
+      }
+      .my-component .btn-group button:hover {
+        background: #ddd;
+      }
+      .my-component .btn-group button:active {
+        background: #ccc;
+      }
+    `;
+
+    document.head.appendChild(style)
+    
+  </script>
+</body>
+</html>
