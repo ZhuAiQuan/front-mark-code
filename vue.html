@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue</title>
+</head>
+<body>
+  <!-- 实现的只是Vue的基础响应式功能，缺少diff等其他核心功能 -->
+  <script>
+    function reactive(obj) {
+      const listeners = new Set();
+
+      const proxy = new Proxy(obj, {
+        get(target, property, receiver) {
+          if (typeof target[property] === 'object' && target[property] !== null) {
+            return reactive(target[property])
+          }
+          return Reflect.get(target, property, receiver)
+        },
+        set(target, property, value, receiver) {
+          const result = Reflect.set(target, property, value, receiver);
+          listeners.forEach(fn => fn());
+          return result
+        }
+      });
+
+      proxy.subscribe = function(fn) {
+        listeners.add(fn);
+      }
+      proxy.unSubscribe = function(fn) {
+        listeners.delete(fn);
+      }
+
+      return proxy
+    }
+
+    class Component {
+      constructor(option) {
+        this.template = option.template;
+        this.data = reactive(option.data());
+        this.methods = option.methods;
+        this.styles = option.styles;
+        this.rootId = option.rootId;
+
+        if (!document.getElementById(this.rootId)) {
+          const root = document.createElement('div');
+          root.id = this.rootId;
+          document.body.append(root);
+        }
+
+        // 每次set订阅render事件 重新渲染
+        this.data.subscribe(this.render.bind(this));
+        this.render();
+      }
+      render() {
+        const el = document.getElementById(this.rootId);
+        if (el) {
+          // 获取最新的数据并渲染上
+          el.innerHTML = this.compileTemplate(this.template)();
+          // 绑定事件方法
+          this.applyMethods(el);
+        }
+      }
+      compileTemplate(template) {
+        // 匹配大括号里的变量
+        const matchs = template.match(/{{\s*(\w+)\s*}}/g);
+        return () => {
+          let compile = template;
+          if (matchs) {
+            matchs.forEach(item => {
+              const key = item.replace(/{{\s*|\s*}}/g, '');
+              compile = compile.replace(item, this.data[key])
+            });
+          }
+          return compile;
+        }
+      }
+      applyMethods(el) {
+        // Object.keys(this.methods).forEach(eventName => {
+        //   const matchs = el.querySelectorAll(`[data-action="${eventName}"]`);
+        //   matchs.forEach(match => {
+        //     match.onclick = this.methods[eventName].bind(this.data);
+        //   })
+        // })
+        // 移出之前的绑定事件
+        const newEl = el.cloneNode(true);
+        el.parentNode.replaceChild(newEl, el);
+        newEl.addEventListener('click', (event) => {
+          const action = event.target.dataset.action;
+          if (action && this.methods[action]) {
+            this.methods[action].call(this.data, event)
+          }
+        })
+      }
+    }
+
+    const App = new Component({
+      data() {
+        return {
+          count: 0,
+        }
+      },
+      methods: {
+        increment() {
+          this.count += 1;
+        },
+        decrement() {
+          this.count -= 1;
+        }
+      },
+      template: `
+        <div class="my-component">
+            <div class="container">
+              <p class="message">Count: {{ count }}</p>
+              <div class="buttons">
+                <button data-action="increment">Increment</button>
+                <button data-action="decrement">Decrease</button>
+              </div>
+            </div>
+          </div>
+        `,
+      styles: `
+          .my-component {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: #f0f0f0;
+          }
+          .my-component .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+          }
+          .my-component .message {
+            font-size: 24px;
+            margin-bottom: 20px;
+          }
+          .my-component .buttons button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+          }
+          .my-component .buttons button:hover {
+            background: #ddd;
+          }
+          .my-component .buttons button:active {
+            background: #ccc;
+          }
+      `,
+      rootId: 'root',
+    });
+
+    const style = document.createElement('style');
+    style.textContent = App.styles;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
